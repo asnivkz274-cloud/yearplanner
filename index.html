@@ -1,0 +1,1305 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no">
+<title>Bangalore Days — Personal Planner</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Nunito+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#FBF7F1;
+  --cream-deep:#F5EEE3;
+  --mauve:#C48B9F;
+  --mauve-soft:#E7CBD5;
+  --maroon:#7A3B4C;
+  --maroon-deep:#5E2A38;
+  --sage:#A9C3A2;
+  --sage-soft:#DCE9D8;
+  --lavender:#C9BFE0;
+  --lavender-soft:#E9E4F4;
+  --beige:#F1E4D3;
+  --beige-deep:#E7D5BC;
+  --gentle-red:#8B3A3A;
+  --gentle-red-soft:#F2DEDE;
+  --ink:#4A3A3F;
+  --ink-soft:#8A7680;
+  --radius:20px;
+  --radius-sm:12px;
+  --shadow:0 6px 20px rgba(122,59,76,0.08);
+  --shadow-sm:0 2px 8px rgba(122,59,76,0.06);
+  --font-display:'Cormorant Garamond', Georgia, serif;
+  --font-body:'Nunito Sans', -apple-system, sans-serif;
+}
+*{box-sizing:border-box; -webkit-tap-highlight-color:transparent;}
+html,body{margin:0;padding:0;background:var(--cream);font-family:var(--font-body);color:var(--ink);}
+body{
+  min-height:100vh;
+  background:
+    radial-gradient(ellipse 500px 300px at 10% -5%, var(--lavender-soft) 0%, transparent 60%),
+    radial-gradient(ellipse 500px 300px at 90% 0%, var(--beige) 0%, transparent 55%),
+    var(--cream);
+}
+#app{max-width:480px;margin:0 auto;min-height:100vh;position:relative;padding-bottom:88px;}
+.hidden{display:none !important;}
+
+/* ---------- Header ---------- */
+.top-header{padding:28px 20px 8px;}
+.greeting{font-family:var(--font-display);font-weight:700;font-size:30px;color:var(--maroon-deep);margin:0;}
+.date-line{font-size:14px;color:var(--ink-soft);margin-top:4px;font-weight:600;}
+.loc-row{display:flex;align-items:center;justify-content:space-between;margin-top:14px;}
+.loc-pill{display:flex;align-items:center;gap:6px;font-weight:700;font-size:14px;color:var(--maroon);}
+.change-loc-btn{background:var(--lavender-soft);color:var(--maroon-deep);border:none;padding:7px 14px;border-radius:999px;font-family:var(--font-body);font-weight:700;font-size:12px;cursor:pointer;}
+.jump-today-btn{background:var(--mauve);color:#fff;border:none;padding:7px 14px;border-radius:999px;font-family:var(--font-body);font-weight:700;font-size:12px;cursor:pointer;margin-left:8px;}
+
+.mode-row{display:flex;gap:8px;margin:16px 20px 0;}
+.mode-btn{flex:1;padding:11px 6px;border-radius:14px;border:2px solid transparent;background:var(--beige);color:var(--maroon-deep);font-family:var(--font-body);font-weight:700;font-size:12.5px;cursor:pointer;text-align:center;transition:transform .15s ease;}
+.mode-btn.active{background:var(--maroon);color:#fff;box-shadow:var(--shadow-sm);}
+.mode-btn:active{transform:scale(0.96);}
+
+/* ---------- Progress ---------- */
+.progress-card{margin:18px 20px;background:linear-gradient(135deg, var(--beige) 0%, var(--mauve-soft) 100%);border-radius:var(--radius);padding:20px 22px;box-shadow:var(--shadow);}
+.progress-title{font-size:12.5px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--maroon-deep);opacity:.75;}
+.progress-pct{font-family:var(--font-display);font-size:44px;font-weight:700;color:var(--maroon-deep);line-height:1.1;margin-top:2px;}
+.progress-bar-track{height:10px;border-radius:999px;background:rgba(122,59,76,0.12);margin-top:12px;overflow:hidden;}
+.progress-bar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg, var(--mauve), var(--maroon));transition:width .4s ease;}
+.progress-sub{margin-top:8px;font-size:12.5px;font-weight:700;color:var(--ink-soft);}
+
+/* ---------- Main goal ---------- */
+.goal-card{margin:0 20px 18px;background:var(--cream-deep);border-radius:var(--radius-sm);padding:14px 16px;box-shadow:var(--shadow-sm);}
+.goal-label{font-size:11.5px;font-weight:800;text-transform:uppercase;letter-spacing:.04em;color:var(--maroon);opacity:.8;}
+.goal-input{width:100%;border:none;background:transparent;font-family:var(--font-display);font-size:19px;font-weight:600;color:var(--ink);margin-top:4px;outline:none;}
+.goal-input::placeholder{color:var(--ink-soft);font-weight:500;}
+
+/* ---------- Sections ---------- */
+.section{margin:16px 20px;background:#fff;border-radius:var(--radius);padding:18px 18px 16px;box-shadow:var(--shadow-sm);border:1px solid rgba(122,59,76,0.05);}
+.section.beige{background:var(--beige);}
+.section.lavender{background:var(--lavender-soft);}
+.section-head{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.section-title{font-family:var(--font-display);font-weight:700;font-size:20px;color:var(--maroon-deep);display:flex;align-items:center;gap:8px;}
+.section-meta{font-size:11.5px;color:var(--ink-soft);font-weight:700;}
+
+.task-row{display:flex;align-items:center;gap:12px;padding:9px 2px;border-bottom:1px solid rgba(122,59,76,0.06);}
+.task-row:last-child{border-bottom:none;}
+.chk{width:22px;height:22px;border-radius:8px;border:2px solid var(--mauve);flex:none;cursor:pointer;position:relative;background:#fff;transition:all .15s ease;}
+.chk.done{background:var(--sage);border-color:var(--sage);}
+.chk.done::after{content:'✓';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;color:#fff;font-size:14px;font-weight:900;}
+.task-label{flex:1;font-weight:700;font-size:14.5px;color:var(--ink);}
+.task-label.done{text-decoration:line-through;opacity:.5;}
+.task-time{font-size:12px;color:var(--ink-soft);font-weight:700;}
+
+textarea.note-box, input.note-line{width:100%;border:1px solid rgba(122,59,76,0.12);background:var(--cream);border-radius:12px;padding:10px 12px;font-family:var(--font-body);font-size:13.5px;color:var(--ink);resize:vertical;outline:none;}
+textarea.note-box{min-height:66px;margin-top:6px;}
+.note-caption{font-size:11.5px;color:var(--ink-soft);font-weight:700;margin-top:10px;margin-bottom:2px;}
+
+/* ---------- Water ---------- */
+.water-glasses{display:flex;flex-wrap:wrap;gap:8px;margin:10px 0;}
+.glass{font-size:22px;opacity:.25;transition:opacity .2s ease;}
+.glass.filled{opacity:1;}
+.water-stats{display:flex;justify-content:space-between;align-items:center;margin-top:8px;}
+.water-amt{font-family:var(--font-display);font-size:22px;font-weight:700;color:var(--maroon-deep);}
+.water-btns{display:flex;gap:8px;}
+.water-btn{border:none;background:var(--sage);color:#fff;font-weight:800;font-size:13px;padding:8px 12px;border-radius:10px;cursor:pointer;}
+.water-btn.minus{background:var(--ink-soft);}
+
+/* ---------- Prayer ---------- */
+.section.prayer{transition:background .3s ease;}
+.section.gentle-active{background:var(--gentle-red-soft);}
+.gentle-row{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.5);border-radius:12px;padding:9px 12px;margin-bottom:10px;}
+.gentle-label{font-weight:800;font-size:13px;color:var(--gentle-red);}
+.switch{width:42px;height:24px;border-radius:999px;background:#ddd;position:relative;cursor:pointer;flex:none;transition:background .2s ease;}
+.switch.on{background:var(--gentle-red);}
+.switch::after{content:'';position:absolute;width:18px;height:18px;background:#fff;border-radius:50%;top:3px;left:3px;transition:left .2s ease;box-shadow:0 1px 3px rgba(0,0,0,.25);}
+.switch.on::after{left:21px;}
+.gentle-msg{font-size:13px;font-weight:700;color:var(--gentle-red);text-align:center;padding:14px 4px;}
+.gentle-msg small{display:block;font-weight:600;color:var(--ink-soft);margin-top:4px;}
+.prayer-note{font-size:10.5px;color:var(--ink-soft);margin-top:10px;line-height:1.4;}
+
+/* ---------- College / Holiday ---------- */
+.college-card{border-radius:14px;padding:14px 16px;background:var(--beige-deep);transition:background .3s ease;}
+.college-card.done{background:var(--sage-soft);}
+.college-status{font-weight:800;font-size:12.5px;color:var(--maroon-deep);}
+.college-status.done{color:#3f6b3a;}
+.college-time-row{display:flex;gap:10px;margin-top:8px;font-size:13px;font-weight:700;color:var(--ink);}
+.end-choice{display:flex;gap:8px;margin-top:10px;}
+.end-btn{flex:1;padding:8px;border-radius:10px;border:2px solid var(--mauve);background:#fff;font-weight:800;font-size:12.5px;color:var(--maroon);cursor:pointer;}
+.end-btn.active{background:var(--maroon);color:#fff;border-color:var(--maroon);}
+
+.list-input-row{display:flex;gap:8px;margin-top:8px;}
+.list-input-row input{flex:1;}
+.add-btn{background:var(--lavender);color:var(--maroon-deep);border:none;border-radius:10px;padding:0 14px;font-weight:800;cursor:pointer;}
+.chip-list{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
+.chip{display:flex;align-items:center;justify-content:space-between;background:var(--cream);border-radius:10px;padding:8px 10px;font-size:13px;font-weight:700;}
+.chip .rm{color:var(--gentle-red);cursor:pointer;font-weight:900;padding:0 4px;}
+
+/* ---------- Focus activities ---------- */
+.focus-row{display:flex;align-items:center;gap:10px;padding:8px 2px;border-bottom:1px solid rgba(122,59,76,0.06);}
+.focus-row:last-child{border-bottom:none;}
+.focus-info{flex:1;}
+.focus-label{font-weight:800;font-size:14px;}
+.focus-time{font-size:11.5px;color:var(--ink-soft);font-weight:700;}
+.rm-btn{background:none;border:none;color:var(--gentle-red);font-size:16px;cursor:pointer;padding:2px 6px;}
+.add-activity{margin-top:10px;display:flex;flex-direction:column;gap:6px;}
+.add-activity select, .add-activity input{border:1px solid rgba(122,59,76,0.15);border-radius:10px;padding:9px 10px;font-family:var(--font-body);font-size:13px;background:#fff;}
+.add-activity-btn{margin-top:2px;background:var(--maroon);color:#fff;border:none;border-radius:10px;padding:9px;font-weight:800;cursor:pointer;font-size:13px;}
+
+/* ---------- Nav ---------- */
+.bottom-nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:480px;background:rgba(251,247,241,0.96);backdrop-filter:blur(10px);border-top:1px solid rgba(122,59,76,0.1);display:flex;padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:50;}
+.nav-btn{flex:1;background:none;border:none;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;cursor:pointer;color:var(--ink-soft);font-family:var(--font-body);}
+.nav-btn .ic{font-size:19px;}
+.nav-btn .lb{font-size:10.5px;font-weight:800;}
+.nav-btn.active{color:var(--maroon-deep);}
+
+/* ---------- Calendar ---------- */
+.view-header{padding:24px 20px 4px;display:flex;align-items:center;justify-content:space-between;}
+.view-title{font-family:var(--font-display);font-weight:700;font-size:26px;color:var(--maroon-deep);}
+.nav-arrow{background:var(--beige);border:none;width:34px;height:34px;border-radius:50%;font-size:16px;font-weight:800;color:var(--maroon);cursor:pointer;}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;padding:14px 20px 4px;}
+.cal-dow{text-align:center;font-size:11px;font-weight:800;color:var(--ink-soft);padding-bottom:4px;}
+.cal-cell{aspect-ratio:1;border-radius:12px;background:var(--cream-deep);display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;position:relative;border:2px solid transparent;}
+.cal-cell.empty{background:transparent;cursor:default;}
+.cal-cell.today{border-color:var(--maroon);}
+.cal-day-num{font-weight:800;font-size:13.5px;color:var(--ink);}
+.cal-day-pct{font-size:9px;font-weight:800;color:var(--maroon-deep);margin-top:1px;}
+.cal-cell.has-data{background:var(--sage-soft);}
+.cal-legend{padding:10px 20px 20px;font-size:11.5px;color:var(--ink-soft);}
+
+/* ---------- Year ---------- */
+.year-grid{padding:10px 20px 20px;display:flex;flex-direction:column;gap:10px;}
+.year-month-card{background:#fff;border-radius:16px;padding:14px 16px;box-shadow:var(--shadow-sm);cursor:pointer;}
+.ymc-top{display:flex;justify-content:space-between;align-items:baseline;}
+.ymc-name{font-family:var(--font-display);font-weight:700;font-size:18px;color:var(--maroon-deep);}
+.ymc-pct{font-weight:800;font-size:13px;color:var(--ink-soft);}
+.ymc-bar-track{height:8px;border-radius:999px;background:rgba(122,59,76,0.1);margin-top:8px;overflow:hidden;}
+.ymc-bar-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,var(--sage),var(--mauve));}
+
+/* ---------- Settings ---------- */
+.settings-group{margin:0 20px 18px;background:#fff;border-radius:var(--radius-sm);padding:16px;box-shadow:var(--shadow-sm);}
+.settings-group h3{font-family:var(--font-display);margin:0 0 10px;color:var(--maroon-deep);font-size:18px;}
+.field{margin-bottom:12px;}
+.field label{display:block;font-size:12px;font-weight:800;color:var(--ink-soft);margin-bottom:5px;}
+.field input, .field select{width:100%;border:1px solid rgba(122,59,76,0.15);border-radius:10px;padding:9px 11px;font-family:var(--font-body);font-size:13.5px;background:var(--cream);}
+.field-row{display:flex;gap:10px;}
+.field-row .field{flex:1;}
+.save-btn{width:calc(100% - 40px);margin:4px 20px 24px;background:var(--maroon);color:#fff;border:none;border-radius:14px;padding:14px;font-weight:800;font-size:14.5px;cursor:pointer;}
+.settings-note{font-size:11.5px;color:var(--ink-soft);padding:0 20px 10px;line-height:1.5;}
+
+.loading-screen{display:flex;align-items:center;justify-content:center;min-height:100vh;flex-direction:column;gap:10px;}
+.loading-screen span{font-family:var(--font-display);font-size:22px;color:var(--maroon-deep);}
+/* ---------- Day Complete Celebration ---------- */
+
+.completion-overlay{
+  position:fixed;
+  inset:0;
+  background:rgba(74,58,63,0.45);
+  backdrop-filter:blur(8px);
+  -webkit-backdrop-filter:blur(8px);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:20px;
+  z-index:9999;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity .4s ease;
+}
+
+.completion-overlay.show{
+  opacity:1;
+  pointer-events:auto;
+}
+
+.completion-card{
+  width:100%;
+  max-width:390px;
+  background:linear-gradient(145deg,#FBF7F1,#F5EEE3);
+  border-radius:28px;
+  padding:38px 24px 30px;
+  text-align:center;
+  box-shadow:0 20px 60px rgba(74,58,63,.25);
+  transform:translateY(25px) scale(.94);
+  transition:transform .5s ease;
+  position:relative;
+  overflow:hidden;
+}
+
+.completion-overlay.show .completion-card{
+  transform:translateY(0) scale(1);
+}
+
+.completion-flower{
+  font-size:32px;
+  animation:flowerFloat 2s ease-in-out infinite;
+}
+
+.completion-arabic{
+  font-family:'Cormorant Garamond',serif;
+  font-size:42px;
+  font-weight:700;
+  color:var(--maroon-deep);
+  margin:12px 0 8px;
+  direction:rtl;
+  animation:arabicGlow 2s ease-in-out infinite;
+}
+
+.completion-title{
+  font-family:var(--font-display);
+  font-size:24px;
+  font-weight:700;
+  color:var(--maroon-deep);
+  margin:4px 0;
+}
+
+.completion-message{
+  font-size:13px;
+  color:var(--ink-soft);
+  font-weight:700;
+  margin:8px 0 22px;
+}
+
+.completion-music-btn{
+  border:none;
+  background:var(--maroon);
+  color:#fff;
+  border-radius:14px;
+  padding:11px 22px;
+  font-family:var(--font-body);
+  font-size:13px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.completion-close-btn{
+  margin-left:8px;
+  border:2px solid var(--mauve);
+  background:#fff;
+  color:var(--maroon);
+  border-radius:14px;
+  padding:9px 18px;
+  font-family:var(--font-body);
+  font-size:13px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+@keyframes arabicGlow{
+  0%,100%{
+    transform:scale(1);
+    opacity:.9;
+  }
+  50%{
+    transform:scale(1.06);
+    opacity:1;
+  }
+}
+
+@keyframes flowerFloat{
+  0%,100%{
+    transform:translateY(0) rotate(0deg);
+  }
+  50%{
+    transform:translateY(-7px) rotate(4deg);
+  }
+}
+/* ---------- Remaining Tasks ---------- */
+
+.remaining-card{
+  margin:0 20px 18px;
+  background:var(--gentle-red-soft);
+  border-radius:var(--radius-sm);
+  padding:15px 16px;
+  box-shadow:var(--shadow-sm);
+  border:1px solid rgba(139,58,58,0.08);
+}
+
+.remaining-title{
+  font-family:var(--font-display);
+  font-size:19px;
+  font-weight:700;
+  color:var(--gentle-red);
+  margin-bottom:8px;
+}
+
+.remaining-sub{
+  font-size:11.5px;
+  color:var(--ink-soft);
+  font-weight:700;
+  margin-bottom:8px;
+}
+
+.remaining-row{
+  display:flex;
+  align-items:center;
+  gap:10px;
+  padding:8px 0;
+  border-bottom:1px solid rgba(139,58,58,0.08);
+}
+
+.remaining-row:last-child{
+  border-bottom:none;
+}
+
+.remaining-check{
+  width:21px;
+  height:21px;
+  border-radius:7px;
+  border:2px solid var(--gentle-red);
+  background:#fff;
+  flex:none;
+  cursor:pointer;
+}
+
+.remaining-label{
+  flex:1;
+  font-size:13.5px;
+  font-weight:700;
+  color:var(--ink);
+}
+
+.remaining-time{
+  font-size:11px;
+  color:var(--ink-soft);
+  font-weight:700;
+}
+
+.all-complete{
+  background:var(--sage-soft);
+  border-color:rgba(63,107,58,0.1);
+}
+
+.all-complete .remaining-title{
+  color:#3f6b3a;
+}
+
+.no-remaining{
+  text-align:center;
+  font-size:13px;
+  font-weight:800;
+  color:#3f6b3a;
+  padding:5px 0;
+}
+</style>
+</head>
+<body>
+<div id="app">
+    <!-- Day Complete Celebration -->
+
+<div id="completion-overlay" class="completion-overlay">
+
+  <div class="completion-card">
+
+    <div class="completion-flower">🌷✨🌸</div>
+
+    <div class="completion-arabic">
+      ٱلْحَمْدُ لِلَّٰهِ
+    </div>
+
+    <div class="completion-title">
+      Day Completed! 🎉
+    </div>
+
+    <div class="completion-message">
+      Alhamdulillah! You completed today's planner.
+    </div>
+
+    <button
+      class="completion-music-btn"
+      onclick="App.stopCompletionMusic()">
+      🔇 Stop Music
+    </button>
+
+    <button
+      class="completion-close-btn"
+      onclick="App.closeCompletion()">
+      Continue
+    </button>
+
+  </div>
+
+</div>
+
+<audio id="completion-music" src="completion-music.mp3" preload="auto"></audio>
+  <div id="loading" class="loading-screen"><span>🌷 Bangalore Days</span><div style="font-size:12px;color:var(--ink-soft);font-weight:700;">loading your planner…</div></div>
+
+  <div id="today-view" class="hidden"></div>
+  <div id="calendar-view" class="hidden"></div>
+  <div id="year-view" class="hidden"></div>
+  <div id="settings-view" class="hidden"></div>
+
+  <div class="bottom-nav hidden" id="bottom-nav">
+    <button class="nav-btn" data-nav="today"><span class="ic">🏠</span><span class="lb">Today</span></button>
+    <button class="nav-btn" data-nav="calendar"><span class="ic">📅</span><span class="lb">Calendar</span></button>
+    <button class="nav-btn" data-nav="year"><span class="ic">🗓️</span><span class="lb">Year</span></button>
+    <button class="nav-btn" data-nav="settings"><span class="ic">⚙️</span><span class="lb">Settings</span></button>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* ================= Storage ================= */
+const STORE_KEY = 'planner-data-v1';
+const TZ = 5.5; // India Standard Time
+
+  const DEFAULT_SETTINGS = {
+  bangalore:{
+    name:'Bangalore',
+    lat:12.9716,
+    lon:77.5946,
+    asrMethod:'hanafi'
+  },
+
+  home:{
+    name:'Home',
+    lat:12.9716,
+    lon:77.5946,
+    asrMethod:'shafii',
+    set:false
+  },
+
+  waterGoalL:2.0,
+  glassML:250,
+  wakeTime:'05:00', sleepTime:'23:00',
+  collegeEndDefault:'15:30',
+  meTimeStart:'17:00', meTimeEnd:'18:00',
+  dinnerTime:'20:00',
+  fajrAngle:18, ishaAngle:17
+};
+
+let state = { settings: JSON.parse(JSON.stringify(DEFAULT_SETTINGS)), days:{} };
+let currentView = 'today';
+let viewDate = new Date(); // the date shown on the "today" (day) view
+let calMonth = new Date(); // month currently shown in calendar
+let saveTimer = null;
+
+async function loadState(){
+  try{
+    const res = await window.storage.get(STORE_KEY, false);
+    if(res && res.value){
+      const parsed = JSON.parse(res.value);
+      state.settings = Object.assign({}, DEFAULT_SETTINGS, parsed.settings||{});
+      state.days = parsed.days || {};
+    }
+  }catch(e){ /* no data yet, use defaults */ }
+}
+function saveState(){
+  clearTimeout(saveTimer);
+  saveTimer = setTimeout(async ()=>{
+    try{ await window.storage.set(STORE_KEY, JSON.stringify(state), false); }
+    catch(e){ console.error('save failed', e); }
+  }, 150);
+}
+
+/* ================= Date helpers ================= */
+function pad(n){return n<10?'0'+n:''+n;}
+function dkey(d){return d.getFullYear()+'-'+pad(d.getMonth()+1)+'-'+pad(d.getDate());}
+function sameDay(a,b){return dkey(a)===dkey(b);}
+function fmtDateLong(d){
+  const days=['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
+  const months=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  return days[d.getDay()]+', '+months[d.getMonth()]+' '+d.getDate()+', '+d.getFullYear();
+}
+function fmtTime12(d){
+  let h=d.getHours(), m=d.getMinutes();
+  const ap = h>=12?'PM':'AM';
+  h = h%12; if(h===0)h=12;
+  return h+':'+pad(m)+' '+ap;
+}
+function parseHM(str, baseDate){
+  const [h,m] = str.split(':').map(Number);
+  const d = new Date(baseDate); d.setHours(h,m,0,0);
+  return d;
+}
+function timeStrToLabel(str){
+  const d = new Date(); const [h,m]=str.split(':').map(Number); d.setHours(h,m,0,0);
+  return fmtTime12(d);
+}
+
+/* ================= Prayer time calculation =================
+   Approximate solar-position based calculation (NOAA-style equations).
+   Good to within a minute or two — intended as a helpful estimate,
+   not a religious authority. */
+function toRad(d){return d*Math.PI/180;}
+function toDeg(r){return r*180/Math.PI;}
+function dayOfYear(date){
+  const start = new Date(date.getFullYear(),0,0);
+  return Math.floor((date-start)/86400000);
+}
+function computePrayerTimes(date, lat, lon, tz, fajrAngle, ishaAngle){
+  const N = dayOfYear(date);
+  const gamma = 2*Math.PI/365 * (N - 1 + 0.5);
+  const eqtime = 229.18*(0.000075+0.001868*Math.cos(gamma)-0.032077*Math.sin(gamma)-0.014615*Math.cos(2*gamma)-0.040849*Math.sin(2*gamma));
+  const decl = 0.006918-0.399912*Math.cos(gamma)+0.070257*Math.sin(gamma)-0.006758*Math.cos(2*gamma)+0.000907*Math.sin(2*gamma)-0.002697*Math.cos(3*gamma)+0.00148*Math.sin(3*gamma);
+  const solarNoonLocalMin = 720 - 4*lon - eqtime + tz*60;
+
+  function hourAngleMin(altDeg){
+    const latR = toRad(lat);
+    const cosH = (Math.sin(toRad(altDeg)) - Math.sin(latR)*Math.sin(decl)) / (Math.cos(latR)*Math.cos(decl));
+    const clamped = Math.max(-1, Math.min(1, cosH));
+    return toDeg(Math.acos(clamped))*4;
+  }
+  function asrAltitude(){
+    const latR = toRad(lat);
+    const diff = Math.abs(latR-decl);
+    return toDeg(Math.atan(1/(1+Math.tan(diff))));
+  }
+  function minToDate(mins){
+    const d = new Date(date); d.setHours(0,0,0,0); d.setMinutes(Math.round(mins));
+    return d;
+  }
+  return {
+    fajr: minToDate(solarNoonLocalMin - hourAngleMin(-fajrAngle)),
+    dhuhr: minToDate(solarNoonLocalMin + 1),
+    asr: minToDate(solarNoonLocalMin + hourAngleMin(asrAltitude())),
+    maghrib: minToDate(solarNoonLocalMin + hourAngleMin(-0.833)),
+    isha: minToDate(solarNoonLocalMin + hourAngleMin(-ishaAngle))
+  };
+}
+
+/* ================= Day data model ================= */
+function blankDay(mode){
+  return {
+    mode: mode || 'bangalore',
+    locKey: mode==='home' ? 'home' : 'bangalore',
+    gentleMode: false,
+    tasks: {},
+    waterML: 0,
+    collegeEnd: state.settings.collegeEndDefault,
+    exerciseNotes: '',
+    wantToDo: '',
+    memory: '',
+    focusActivities: [],
+    mainGoal: '',
+    notes: ''
+  };
+}
+function getDay(date){
+  const k = dkey(date);
+  if(!state.days[k]) state.days[k] = blankDay('bangalore');
+  return state.days[k];
+}
+function setTask(day, id, val){ day.tasks[id]=val; saveState(); }
+
+const FOCUS_OPTIONS = ['🌐 Website Development','📊 Data Analytics','💻 Programming','🤖 AI / Technology','📚 College Study','📝 Assignment','✍️ Writing','🎯 Career Learning','📖 Reading','🧩 Personal Project','➕ Custom'];
+
+/* task keys used for progress, depending on mode */
+function activeTaskKeys(day){
+  let keys = ['wakeUp','exercise','meditation','breakfast','waterGoal'];
+  if(!day.gentleMode) keys = keys.concat(['fajr','quranFajr','dhuhr','asr','maghrib','quranMaghrib','isha']);
+  if(day.mode==='bangalore') keys = keys.concat(['lunch','collegeDone']);
+  else if(day.mode==='holiday') keys = keys.concat(['studyRevision','careerLearning','lunch']);
+  else if(day.mode==='home') keys = keys.concat(['familyTime','timeAtHome','helpAtHome','meetRelatives','hobbyTime','outdoorFun','memoriesPhotos']);
+  keys = keys.concat(['meTime','dinner','studyRevision','nightMeTime','sleepOnTime']);
+  return keys;
+}
+function computeProgress(day){
+  const keys = activeTaskKeys(day);
+  let total = keys.length + day.focusActivities.length;
+  let done = 0;
+  keys.forEach(k=>{
+    if(k==='waterGoal'){ if(day.waterML >= state.settings.waterGoalL*1000) done++; }
+    else if(day.tasks[k]) done++;
+  });
+  day.focusActivities.forEach(f=>{ if(f.done) done++; });
+  return {done, total, pct: total? Math.round(done/total*100):0};
+}
+function renderRemainingTasks(day){
+
+  const container = document.getElementById('remaining-tasks');
+
+  if(!container) return;
+
+  const keys = activeTaskKeys(day);
+
+  const taskNames = {
+
+    wakeUp:'Wake Up',
+    exercise:'Exercise / Physical Activity',
+    meditation:'Meditation',
+    breakfast:'Breakfast',
+
+    fajr:'Fajr',
+    quranFajr:'Quran — After Fajr',
+    dhuhr:'Dhuhr',
+    asr:'Asr',
+    maghrib:'Maghrib',
+    quranMaghrib:'Quran — After Maghrib',
+    isha:'Isha',
+
+    lunch:'Lunch',
+    collegeDone:'College Day',
+    studyRevision:'Study / Revision',
+    careerLearning:'Career / Personal Learning',
+
+    familyTime:'Family Time',
+    timeAtHome:'Time at Home',
+    helpAtHome:'Help at Home',
+    meetRelatives:'Meet Relatives / Friends',
+    hobbyTime:'Hobby Time',
+    outdoorFun:'Outdoor / Fun Time',
+    memoriesPhotos:'Memories / Photos',
+
+    meTime:'Evening Me Time',
+    dinner:'Dinner',
+    nightStudy:'Study & Writing',
+    nightMeTime:'Night Me Time',
+    sleepOnTime:'Sleep on time'
+  };
+
+  const remaining = [];
+
+  keys.forEach(key=>{
+
+    let completed = false;
+
+    if(key === 'waterGoal'){
+      completed =
+        day.waterML >= state.settings.waterGoalL * 1000;
+    }else{
+      completed = !!day.tasks[key];
+    }
+
+    if(!completed){
+      remaining.push({
+        key:key,
+        label:taskNames[key] || key
+      });
+    }
+
+  });
+
+  day.focusActivities.forEach((f,i)=>{
+
+    if(!f.done){
+
+      remaining.push({
+        key:'focus-'+i,
+        label:f.label,
+        focusIndex:i,
+        time:f.time || ''
+      });
+
+    }
+
+  });
+
+  let html = '';
+
+  if(remaining.length === 0){
+
+    html = `
+      <div class="remaining-card all-complete">
+        <div class="remaining-title">🎉 All Done!</div>
+        <div class="no-remaining">
+          ✨ Nothing left to complete today.
+        </div>
+      </div>
+    `;
+
+  }else{
+
+    html = `
+      <div class="remaining-card">
+
+        <div class="remaining-title">
+          📋 Still to Complete
+        </div>
+
+        <div class="remaining-sub">
+          ${remaining.length} item${remaining.length===1?'':'s'} remaining
+        </div>
+    `;
+
+    remaining.forEach(item=>{
+
+      html += `
+        <div class="remaining-row">
+
+          <div
+            class="remaining-check"
+            onclick="${
+              item.key.startsWith('focus-')
+              ? `App.toggleFocus(${item.focusIndex})`
+              : item.key === 'waterGoal'
+              ? `App.addWater(state.settings.waterGoalL*1000 - getDay(viewDate).waterML)`
+              : `App.toggle('${item.key}')`
+            }">
+          </div>
+
+          <div class="remaining-label">
+            ${escHtml(item.label)}
+          </div>
+
+          ${
+            item.time
+            ? `<div class="remaining-time">${escHtml(item.time)}</div>`
+            : ''
+          }
+
+        </div>
+      `;
+
+    });
+
+    html += `</div>`;
+
+  }
+
+  container.innerHTML = html;
+}
+
+/* ================= Rendering: TODAY / DAY VIEW ================= */
+function greetingFor(d){
+  const h = d.getHours();
+  if(h<12) return 'Good Morning 🌷';
+  if(h<17) return 'Good Afternoon 🌸';
+  return 'Good Evening 🌙';
+}
+
+function renderToday(){
+  const day = getDay(viewDate);
+  const isToday = sameDay(viewDate, new Date());
+  const loc = state.settings[day.locKey] || state.settings.bangalore;
+  const prayer = computePrayerTimes(viewDate, loc.lat, loc.lon, TZ, state.settings.fajrAngle, state.settings.ishaAngle);
+  const prog = computeProgress(day);
+
+  let html = '';
+
+  // Header
+  html += `<div class="top-header">
+    <p class="greeting">${isToday? greetingFor(new Date()) : '🌷 Viewing a day'}</p>
+    <div class="date-line">${fmtDateLong(viewDate)}</div>
+    <div class="loc-row">
+      <div class="loc-pill">📍 ${loc.name}</div>
+      <div>
+        <button class="change-loc-btn" onclick="App.changeLocation()">Change Location</button>
+        ${isToday?'':'<button class="jump-today-btn" onclick="App.goToday()">Today</button>'}
+      </div>
+    </div>
+    <div class="mode-row">
+      <button class="mode-btn ${day.mode==='bangalore'?'active':''}" onclick="App.setMode('bangalore')">🎓 Bangalore</button>
+      <button class="mode-btn ${day.mode==='home'?'active':''}" onclick="App.setMode('home')">🏡 Home</button>
+      <button class="mode-btn ${day.mode==='holiday'?'active':''}" onclick="App.setMode('holiday')">🌿 Holiday</button>
+    </div>
+  </div>`;
+
+  // Main goal
+  html += `<div class="goal-card">
+    <div class="goal-label">🎯 Today's Main Goal</div>
+    <input class="goal-input" placeholder="What matters most today?" value="${escAttr(day.mainGoal)}" onchange="App.setField('mainGoal', this.value)">
+  </div>`;
+
+  // Progress
+  html += `<div class="progress-card">
+    <div class="progress-title">Today's Progress</div>
+    <div class="progress-pct">${prog.pct}%</div>
+    <div class="progress-bar-track"><div class="progress-bar-fill" style="width:${prog.pct}%"></div></div>
+    <div class="progress-sub">Completed: ${prog.done} / ${prog.total}</div>
+  </div>`;
+  html += `<div id="remaining-tasks"></div>`;
+
+  // Morning
+  html += `<div class="section">
+    <div class="section-head"><div class="section-title">🌅 Morning Routine</div><div class="section-meta">${timeStrToLabel(state.settings.wakeTime)}</div></div>
+    ${taskRow(day,'wakeUp','Wake Up')}
+    ${taskRow(day,'exercise','Exercise / Physical Activity')}
+    ${taskRow(day,'meditation','Meditation')}
+    ${taskRow(day,'breakfast','Breakfast')}
+    <div class="note-caption">🧘 What I did today (exercise &amp; meditation)</div>
+    <textarea class="note-box" placeholder="e.g. 20 min walk, 10 min breathing…" onchange="App.setField('exerciseNotes', this.value)">${escHtml(day.exerciseNotes)}</textarea>
+  </div>`;
+
+  // Water
+  const goalML = state.settings.waterGoalL*1000;
+  const glassCount = Math.max(1, Math.round(goalML/state.settings.glassML));
+  const filledGlasses = Math.min(glassCount, Math.round(day.waterML/state.settings.glassML));
+  let glassesHtml='';
+  for(let i=0;i<glassCount;i++) glassesHtml += `<span class="glass ${i<filledGlasses?'filled':''}">🥛</span>`;
+  html += `<div class="section beige">
+    <div class="section-head"><div class="section-title">💧 Water</div><div class="section-meta">Goal: ${state.settings.waterGoalL.toFixed(2)} L</div></div>
+    <div class="water-glasses">${glassesHtml}</div>
+    <div class="water-stats">
+      <div class="water-amt">${(day.waterML/1000).toFixed(2)} L / ${state.settings.waterGoalL.toFixed(2)} L</div>
+      <div class="water-btns">
+        <button class="water-btn minus" onclick="App.addWater(-${state.settings.glassML})">−</button>
+        <button class="water-btn" onclick="App.addWater(${state.settings.glassML})">+${state.settings.glassML} mL</button>
+      </div>
+    </div>
+  </div>`;
+
+  // Prayer & Quran
+  html += `<div class="section prayer ${day.gentleMode?'gentle-active':''}">
+    <div class="section-head"><div class="section-title">🕌 Prayer &amp; Quran</div></div>
+    <div class="gentle-row">
+      <div class="gentle-label">🌸 Gentle Mode</div>
+      <div class="switch ${day.gentleMode?'on':''}" onclick="App.toggleGentle()"></div>
+    </div>`;
+  if(day.gentleMode){
+    html += `<div class="gentle-msg">🌸 Gentle Mode Active<small>Prayer and Quran tracking is paused for today. Nothing here counts as missed.</small></div>`;
+  } else {
+    html += taskRow(day,'fajr','Fajr', fmtTime12(prayer.fajr));
+    html += taskRow(day,'quranFajr','Quran — After Fajr');
+    html += taskRow(day,'dhuhr','Dhuhr', fmtTime12(prayer.dhuhr));
+    html += taskRow(day,'asr','Asr', fmtTime12(prayer.asr));
+    html += taskRow(day,'maghrib','Maghrib', fmtTime12(prayer.maghrib));
+    html += taskRow(day,'quranMaghrib','Quran — After Maghrib');
+    html += taskRow(day,'isha','Isha', fmtTime12(prayer.isha));
+    html += `<div class="prayer-note">Times are estimated for ${loc.name} using the sun's position (Fajr ${state.settings.fajrAngle}°, Isha ${state.settings.ishaAngle}°) — please cross-check with a trusted local source.</div>`;
+  }
+  html += `</div>`;
+
+  // Mode-specific section
+  if(day.mode==='bangalore'){
+    const nowM = new Date();
+    const endD = parseHM(day.collegeEnd, viewDate);
+    let done;
+    if(isToday) done = nowM >= endD;
+    else done = viewDate < new Date(new Date().setHours(0,0,0,0));
+    html += `<div class="section">
+      <div class="section-head"><div class="section-title">🎓 College</div></div>
+      <div class="college-card ${done?'done':''}">
+        <div class="college-status ${done?'done':''}">${done?'✓ College Completed':'🎓 Active College'}</div>
+        <div class="college-time-row"><span>9:00 AM → Leave</span><span>9:15 AM → Classes Start</span></div>
+        <div class="college-time-row"><span>1:30 PM → First Session Ends</span></div>
+        <div class="end-choice">
+          <button class="end-btn ${day.collegeEnd==='15:30'?'active':''}" onclick="App.setCollegeEnd('15:30')">Ends 3:30 PM</button>
+          <button class="end-btn ${day.collegeEnd==='16:30'?'active':''}" onclick="App.setCollegeEnd('16:30')">Ends 4:30 PM</button>
+        </div>
+      </div>
+      <div style="margin-top:10px;">
+        ${taskRow(day,'collegeDone','Mark College Day Done')}
+        ${taskRow(day,'lunch','Lunch', '1:30 – 2:30 PM')}
+      </div>
+    </div>`;
+  } else if(day.mode==='holiday'){
+    html += `<div class="section lavender">
+      <div class="section-head"><div class="section-title">🌿 Holiday Plan</div></div>
+      ${taskRow(day,'studyRevision','📚 Study / Revision', '9:00 – 10:30 AM')}
+      ${taskRow(day,'careerLearning','💻 Career / Personal Learning', '11:00 AM – 12:30 PM')}
+      ${taskRow(day,'lunch','🍱 Lunch', '1:30 PM')}
+    </div>`;
+  } else if(day.mode==='home'){
+    html += `<div class="section beige">
+      <div class="section-head"><div class="section-title">❤️ Family &amp; Home</div></div>
+      ${taskRow(day,'familyTime','👨‍👩‍👧 Family Time')}
+      ${taskRow(day,'timeAtHome','🏡 Time at Home')}
+      ${taskRow(day,'helpAtHome','🍳 Help at Home')}
+      ${taskRow(day,'meetRelatives','🤝 Meet Relatives / Friends')}
+      ${taskRow(day,'hobbyTime','🎨 Hobby Time')}
+      ${taskRow(day,'outdoorFun','🌳 Outdoor / Fun Time')}
+      ${taskRow(day,'memoriesPhotos','📸 Memories / Photos')}
+      <div class="note-caption">✨ Things I Want To Do</div>
+      ${listEditor(day.wantToDo, 'wantToDo')}
+      <div class="note-caption">📝 Today's Memory — what was special about today?</div>
+      <textarea class="note-box" onchange="App.setField('memory', this.value)">${escHtml(day.memory)}</textarea>
+    </div>`;
+  }
+
+  // Evening Me Time
+  html += `<div class="section">
+    <div class="section-head"><div class="section-title">🌆 Evening Me Time</div><div class="section-meta">${timeStrToLabel(state.settings.meTimeStart)} – ${timeStrToLabel(state.settings.meTimeEnd)}</div></div>
+    ${taskRow(day,'meTime','Reels, hobby, music — anything you want')}
+  </div>`;
+
+  // Productive time (bangalore + holiday)
+  if(day.mode!=='home'){
+    html += `<div class="section">
+      <div class="section-head"><div class="section-title">🚀 Today's Focus</div></div>`;
+    if(day.focusActivities.length===0){
+      html += `<div style="font-size:12.5px;color:var(--ink-soft);font-weight:700;">No focus activities added yet.</div>`;
+    }
+    day.focusActivities.forEach((f,i)=>{
+      html += `<div class="focus-row">
+        <div class="chk ${f.done?'done':''}" onclick="App.toggleFocus(${i})"></div>
+        <div class="focus-info"><div class="focus-label">${escHtml(f.label)}</div><div class="focus-time">${escHtml(f.time||'')}</div></div>
+        <button class="rm-btn" onclick="App.removeFocus(${i})">✕</button>
+      </div>`;
+    });
+    html += `<div class="add-activity">
+      <select id="focus-select">${FOCUS_OPTIONS.map(o=>`<option value="${escAttr(o)}">${o}</option>`).join('')}</select>
+      <input id="focus-time" placeholder="e.g. 6:00 – 7:00 PM">
+      <button class="add-activity-btn" onclick="App.addFocus()">+ Add Activity</button>
+    </div></div>`;
+  }
+
+  // Dinner
+  html += `<div class="section">
+    <div class="section-head"><div class="section-title">🍽️ Dinner</div><div class="section-meta">${timeStrToLabel(state.settings.dinnerTime)}</div></div>
+    ${taskRow(day,'dinner','Completed')}
+  </div>`;
+
+  // Night study
+ // Night study — hidden in Home Mode
+
+if(day.mode !== 'home'){
+
+  html += `<div class="section">
+
+    <div class="section-head">
+      <div class="section-title">📚 Study &amp; Writing</div>
+    </div>
+
+    ${taskRow(day,'nightStudy','Revision, writing, notes, assignment')}
+
+  </div>`;
+
+}
+
+  // Night me time
+  html += `<div class="section">
+    <div class="section-head"><div class="section-title">🌙 Night Me Time</div><div class="section-meta">before ${timeStrToLabel(state.settings.sleepTime)}</div></div>
+    ${taskRow(day,'nightMeTime','Wind down before bed')}
+  </div>`;
+
+  // Sleep
+  html += `<div class="section beige">
+    <div class="section-head"><div class="section-title">😴 Sleep</div></div>
+    <div style="font-size:13.5px;font-weight:700;">Target Sleep: ${timeStrToLabel(state.settings.sleepTime)}</div>
+    <div style="font-size:13.5px;font-weight:700;margin-top:4px;color:var(--ink-soft);">🌅 Tomorrow wake-up: ${timeStrToLabel(state.settings.wakeTime)}</div>
+    ${taskRow(day,'sleepOnTime','Slept on time')}
+  </div>`;
+
+  // Quick notes
+  html += `<div class="section">
+    <div class="section-head"><div class="section-title">📝 Quick Notes</div></div>
+    <textarea class="note-box" placeholder="Anything you want to remember…" onchange="App.setField('notes', this.value)">${escHtml(day.notes)}</textarea>
+  </div>`;
+
+  document.getElementById('today-view').innerHTML = html;
+
+  renderRemainingTasks(day);
+}
+
+function taskRow(day, id, label, time){
+  const on = !!day.tasks[id];
+  return `<div class="task-row">
+    <div class="chk ${on?'done':''}" onclick="App.toggle('${id}')"></div>
+    <div class="task-label ${on?'done':''}">${label}</div>
+    ${time?`<div class="task-time">${time}</div>`:''}
+  </div>`;
+}
+function listEditor(value, field){
+  const items = (value||'').split('\n').filter(x=>x.trim().length);
+  let html = `<div class="chip-list">`;
+  items.forEach((it,i)=>{
+    html += `<div class="chip"><span>${escHtml(it)}</span><span class="rm" onclick="App.removeListItem('${field}', ${i})">✕</span></div>`;
+  });
+  html += `</div><div class="list-input-row"><input id="listinput-${field}" placeholder="Add something…" onkeydown="if(event.key==='Enter'){App.addListItem('${field}')}"><button class="add-btn" onclick="App.addListItem('${field}')">Add</button></div>`;
+  return html;
+}
+function escHtml(s){ return (s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function escAttr(s){ return (s||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;'); }
+
+/* ================= Calendar view ================= */
+function renderCalendar(){
+  const y = calMonth.getFullYear(), m = calMonth.getMonth();
+  const monthNames=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const first = new Date(y,m,1);
+  const startDow = first.getDay();
+  const daysInMonth = new Date(y,m+1,0).getDate();
+  const today = new Date();
+
+  let html = `<div class="view-header">
+    <button class="nav-arrow" onclick="App.calPrev()">‹</button>
+    <div class="view-title">${monthNames[m]} ${y}</div>
+    <button class="nav-arrow" onclick="App.calNext()">›</button>
+  </div>
+  <div class="cal-grid">`;
+  ['S','M','T','W','T','F','S'].forEach(d=> html += `<div class="cal-dow">${d}</div>`);
+  for(let i=0;i<startDow;i++) html += `<div class="cal-cell empty"></div>`;
+  for(let d=1; d<=daysInMonth; d++){
+    const dateObj = new Date(y,m,d);
+    const k = dkey(dateObj);
+    const dayData = state.days[k];
+    const isToday = sameDay(dateObj, today);
+    let pctLabel = '';
+    let hasData = false;
+    if(dayData){
+      const p = computeProgress(dayData);
+      if(p.total>0 && (p.done>0 || Object.keys(dayData.tasks).length>0)){ pctLabel = p.pct+'%'; hasData = true; }
+    }
+    html += `<div class="cal-cell ${isToday?'today':''} ${hasData?'has-data':''}" onclick="App.openDate('${k}')">
+      <div class="cal-day-num">${d}</div>
+      ${pctLabel?`<div class="cal-day-pct">${pctLabel}</div>`:''}
+    </div>`;
+  }
+  html += `</div><div class="cal-legend">🌿 Shaded days have logged progress · tap any date to open it</div>`;
+  document.getElementById('calendar-view').innerHTML = html;
+}
+
+/* ================= Year view ================= */
+function renderYear(){
+  const y = calMonth.getFullYear();
+  const monthNames=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  let html = `<div class="view-header"><div></div><div class="view-title">${y}</div><div></div></div><div class="year-grid">`;
+  for(let m=0;m<12;m++){
+    const daysInMonth = new Date(y,m+1,0).getDate();
+    let sum=0, count=0;
+    for(let d=1; d<=daysInMonth; d++){
+      const k = y+'-'+pad(m+1)+'-'+pad(d);
+      const dd = state.days[k];
+      if(dd){ const p = computeProgress(dd); if(p.total>0){ sum+=p.pct; count++; } }
+    }
+    const avg = count? Math.round(sum/count) : 0;
+    html += `<div class="year-month-card" onclick="App.openMonth(${m})">
+      <div class="ymc-top"><div class="ymc-name">${monthNames[m]}</div><div class="ymc-pct">${count? avg+'%':'—'}</div></div>
+      <div class="ymc-bar-track"><div class="ymc-bar-fill" style="width:${avg}%"></div></div>
+    </div>`;
+  }
+  html += `</div>`;
+  document.getElementById('year-view').innerHTML = html;
+}
+
+/* ================= Settings view ================= */
+function renderSettings(){
+  const s = state.settings;
+  let html = `<div class="view-header"><div></div><div class="view-title">⚙️ Settings</div><div></div></div>
+  <div class="settings-group">
+    <h3>📍 Locations</h3>
+    <div class="field"><label>Bangalore — name</label><input id="set-bl-name" value="${escAttr(s.bangalore.name)}"></div>
+    <div class="field-row">
+      <div class="field"><label>Latitude</label><input id="set-bl-lat" value="${s.bangalore.lat}"></div>
+      <div class="field"><label>Longitude</label><input id="set-bl-lon" value="${s.bangalore.lon}"></div>
+    </div>
+    <div class="field"><label>Home / Native — name</label><input id="set-home-name" value="${escAttr(s.home.name)}"></div>
+    <div class="field-row">
+      <div class="field"><label>Latitude</label><input id="set-home-lat" value="${s.home.lat}"></div>
+      <div class="field"><label>Longitude</label><input id="set-home-lon" value="${s.home.lon}"></div>
+    </div>
+  </div>
+  <div class="settings-group">
+    <h3>💧 Water</h3>
+    <div class="field-row">
+      <div class="field"><label>Daily goal (L)</label><input id="set-water-goal" value="${s.waterGoalL}"></div>
+      <div class="field"><label>Glass size (mL)</label><input id="set-glass-ml" value="${s.glassML}"></div>
+    </div>
+  </div>
+  <div class="settings-group">
+    <h3>⏰ Daily rhythm</h3>
+    <div class="field-row">
+      <div class="field"><label>Wake-up time</label><input type="time" id="set-wake" value="${s.wakeTime}"></div>
+      <div class="field"><label>Sleep time</label><input type="time" id="set-sleep" value="${s.sleepTime}"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>College end (default)</label><input type="time" id="set-college-end" value="${s.collegeEndDefault}"></div>
+      <div class="field"><label>Dinner time</label><input type="time" id="set-dinner" value="${s.dinnerTime}"></div>
+    </div>
+    <div class="field-row">
+      <div class="field"><label>Evening Me Time start</label><input type="time" id="set-metime-start" value="${s.meTimeStart}"></div>
+      <div class="field"><label>Evening Me Time end</label><input type="time" id="set-metime-end" value="${s.meTimeEnd}"></div>
+    </div>
+  </div>
+  <div class="settings-group">
+    <h3>🕌 Prayer calculation</h3>
+    <div class="field-row">
+      <div class="field"><label>Fajr angle (°)</label><input id="set-fajr-angle" value="${s.fajrAngle}"></div>
+      <div class="field"><label>Isha angle (°)</label><input id="set-isha-angle" value="${s.ishaAngle}"></div>
+    </div>
+    <div class="settings-note" style="padding:0;">Default 18°/17° (Muslim World League). Prayer times are estimated from sun position — please verify with a trusted local source.</div>
+  </div>
+  <button class="save-btn" onclick="App.saveSettings()">Save Settings</button>
+  <div class="settings-note">Bangalore Days keeps your data on this device via secure app storage. Nothing is shared.</div>`;
+  document.getElementById('settings-view').innerHTML = html;
+}
+
+/* ================= View switching ================= */
+function showView(v){
+  currentView = v;
+  ['today','calendar','year','settings'].forEach(name=>{
+    document.getElementById(name+'-view').classList.toggle('hidden', name!==v);
+  });
+  document.querySelectorAll('.nav-btn').forEach(b=> b.classList.toggle('active', b.dataset.nav===v));
+  if(v==='today') renderToday();
+  if(v==='calendar') renderCalendar();
+  if(v==='year') renderYear();
+  if(v==='settings') renderSettings();
+}
+
+/* ================= App actions (exposed) ================= */
+const App = {
+      showCompletion(){
+
+    const overlay = document.getElementById('completion-overlay');
+    const music = document.getElementById('completion-music');
+
+    if(!overlay || !music) return;
+
+    overlay.classList.add('show');
+
+    music.currentTime = 0;
+
+    music.play().catch(()=>{
+      console.log('Music playback requires user interaction.');
+    });
+  },
+
+  stopCompletionMusic(){
+
+    const music = document.getElementById('completion-music');
+
+    if(music){
+      music.pause();
+      music.currentTime = 0;
+    }
+  },
+
+  closeCompletion(){
+
+    const overlay = document.getElementById('completion-overlay');
+
+    if(overlay){
+      overlay.classList.remove('show');
+    }
+
+    this.stopCompletionMusic();
+  },
+  toggle(id){
+
+  const day = getDay(viewDate);
+
+  const wasComplete = computeProgress(day).pct === 100;
+
+  setTask(day,id,!day.tasks[id]);
+
+  renderToday();
+
+  const progress = computeProgress(day);
+
+  if(progress.pct === 100 && !wasComplete){
+
+    setTimeout(()=>{
+      App.showCompletion();
+    },300);
+
+  }
+},
+toggleFocus(i){
+
+  const day = getDay(viewDate);
+
+  const wasComplete = computeProgress(day).pct === 100;
+
+  day.focusActivities[i].done = !day.focusActivities[i].done;
+
+  saveState();
+  renderToday();
+
+  const progress = computeProgress(day);
+
+  if(progress.pct === 100 && !wasComplete){
+
+    setTimeout(()=>{
+      App.showCompletion();
+    },300);
+
+  }
+},
+  removeFocus(i){ const day=getDay(viewDate); day.focusActivities.splice(i,1); saveState(); renderToday(); },
+  addFocus(){
+    const sel = document.getElementById('focus-select');
+    const time = document.getElementById('focus-time');
+    const day = getDay(viewDate);
+    day.focusActivities.push({label: sel.value, time: time.value, done:false});
+    saveState(); renderToday();
+  },
+addWater(delta){
+
+  const day = getDay(viewDate);
+
+  const wasComplete = computeProgress(day).pct === 100;
+
+  day.waterML = Math.max(0, day.waterML + delta);
+
+  saveState();
+  renderToday();
+
+  const progress = computeProgress(day);
+
+  if(progress.pct === 100 && !wasComplete){
+
+    setTimeout(()=>{
+      App.showCompletion();
+    },300);
+
+  }
+},
+  toggleGentle(){ const day=getDay(viewDate); day.gentleMode=!day.gentleMode; saveState(); renderToday(); },
+  setMode(mode){
+    const day = getDay(viewDate);
+    day.mode = mode;
+    if(mode==='home') day.locKey='home'; else if(mode==='bangalore') day.locKey='bangalore';
+    saveState(); renderToday();
+  },
+  setCollegeEnd(val){ const day=getDay(viewDate); day.collegeEnd=val; saveState(); renderToday(); },
+  setField(field, val){ const day=getDay(viewDate); day[field]=val; saveState(); },
+  addListItem(field){
+    const input = document.getElementById('listinput-'+field);
+    if(!input || !input.value.trim()) return;
+    const day = getDay(viewDate);
+    const items = (day[field]||'').split('\n').filter(x=>x.trim().length);
+    items.push(input.value.trim());
+    day[field] = items.join('\n');
+    saveState(); renderToday();
+  },
+  removeListItem(field, idx){
+    const day = getDay(viewDate);
+    const items = (day[field]||'').split('\n').filter(x=>x.trim().length);
+    items.splice(idx,1);
+    day[field] = items.join('\n');
+    saveState(); renderToday();
+  },
+  changeLocation(){
+    const day = getDay(viewDate);
+    day.locKey = day.locKey==='bangalore' ? 'home' : 'bangalore';
+    saveState(); renderToday();
+  },
+  goToday(){ viewDate = new Date(); renderToday(); },
+  openDate(k){ const [y,m,d]=k.split('-').map(Number); viewDate = new Date(y,m-1,d); showView('today'); },
+  openMonth(m){ calMonth = new Date(calMonth.getFullYear(), m, 1); showView('calendar'); },
+  calPrev(){ calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth()-1, 1); renderCalendar(); },
+  calNext(){ calMonth = new Date(calMonth.getFullYear(), calMonth.getMonth()+1, 1); renderCalendar(); },
+  saveSettings(){
+    const s = state.settings;
+    s.bangalore.name = document.getElementById('set-bl-name').value || 'Bangalore';
+    s.bangalore.lat = parseFloat(document.getElementById('set-bl-lat').value) || s.bangalore.lat;
+    s.bangalore.lon = parseFloat(document.getElementById('set-bl-lon').value) || s.bangalore.lon;
+    s.home.name = document.getElementById('set-home-name').value || 'Home';
+    s.home.lat = parseFloat(document.getElementById('set-home-lat').value) || s.home.lat;
+    s.home.lon = parseFloat(document.getElementById('set-home-lon').value) || s.home.lon;
+    s.home.set = true;
+    s.waterGoalL = parseFloat(document.getElementById('set-water-goal').value) || s.waterGoalL;
+    s.glassML = parseInt(document.getElementById('set-glass-ml').value) || s.glassML;
+    s.wakeTime = document.getElementById('set-wake').value || s.wakeTime;
+    s.sleepTime = document.getElementById('set-sleep').value || s.sleepTime;
+    s.collegeEndDefault = document.getElementById('set-college-end').value || s.collegeEndDefault;
+    s.dinnerTime = document.getElementById('set-dinner').value || s.dinnerTime;
+    s.meTimeStart = document.getElementById('set-metime-start').value || s.meTimeStart;
+    s.meTimeEnd = document.getElementById('set-metime-end').value || s.meTimeEnd;
+    s.fajrAngle = parseFloat(document.getElementById('set-fajr-angle').value) || s.fajrAngle;
+    s.ishaAngle = parseFloat(document.getElementById('set-isha-angle').value) || s.ishaAngle;
+    saveState();
+    showView('today');
+  }
+};
+window.App = App;
+
+/* ================= Nav wiring ================= */
+document.querySelectorAll('.nav-btn').forEach(btn=>{
+  btn.addEventListener('click', ()=> showView(btn.dataset.nav));
+});
+
+/* ================= Init ================= */
+(async function init(){
+  await loadState();
+  document.getElementById('loading').classList.add('hidden');
+  document.getElementById('bottom-nav').classList.remove('hidden');
+  showView('today');
+  // live refresh for college-status color etc.
+  setInterval(()=>{ if(currentView==='today' && sameDay(viewDate,new Date())) renderToday(); }, 60000);
+})();
+
+})();
+</script>
+</body>
+</html>
